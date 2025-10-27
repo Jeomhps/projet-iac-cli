@@ -2,6 +2,14 @@
 
 Go CLI for the Projet IAC API at `https://localhost/api` (by default).
 
+## Table of contents
+- [Install (private via SSH)](#install-private-via-ssh)
+- [Uninstall](#uninstall)
+- [Build](#build)
+- [Quick start (dev)](#quick-start-dev)
+- [Config (flags or env)](#config-flags-or-env)
+- [Keychain storage](#keychain-storage)
+
 ## Install (private via SSH)
 
 Because this repository is private, the Go toolchain must fetch it via Git using your SSH key.
@@ -41,13 +49,60 @@ projet-iac-cli --version
 ```
 
 Troubleshooting
-- Remove/inspect the SSH mapping
+- Inspect/remove the SSH mapping
   ```bash
   git config --global --get-all url."ssh://git@github.com/".insteadOf
   # To remove:
   # git config --global --unset-all url."ssh://git@github.com/".insteadOf
   ```
-- If go install still prompts for HTTPS credentials, the mapping isn’t being applied; re-check step 2.
+- If `go install` still prompts for HTTPS credentials, the mapping isn’t being applied; re-check step 2.
+
+## Uninstall
+
+1) Remove the binary
+- If installed via `go install`:
+  ```bash
+  rm -f "$(go env GOPATH)/bin/projet-iac-cli"
+  ```
+- If you manually copied it to a system path:
+  ```bash
+  # Example
+  sudo rm -f /usr/local/bin/projet-iac-cli
+  ```
+
+2) Remove cached token (recommended before removing the binary)
+- Using the CLI:
+  ```bash
+  projet-iac-cli logout
+  ```
+- If the CLI is already removed:
+  - macOS (Keychain Access):
+    - Open Keychain Access → search for “projet-iac-cli” → delete the entry with account `api:https://localhost/api`.
+    - Or via terminal:
+      ```bash
+      security delete-generic-password -s projet-iac-cli -a 'api:https://localhost/api' || true
+      ```
+  - Windows (Credential Manager):
+    - Open “Credential Manager” → “Windows Credentials” → remove the entry named “projet-iac-cli” (account `api:https://localhost/api`).
+  - Linux (Secret Service, if used):
+    - Use your keyring UI (GNOME Keyring/KWallet) to remove the “projet-iac-cli” secret with account `api:https://localhost/api`.
+    - If no keyring was available, the token file is at:
+      ```bash
+      rm -f ~/.projet-iac/token.json
+      ```
+
+3) Optional cleanup
+- Remove the SSH rewrite (if you only added it for this project):
+  ```bash
+  git config --global --unset-all url."ssh://git@github.com/".insteadOf
+  ```
+- Adjust or clear GOPRIVATE (only if you no longer need private module access under your account):
+  ```bash
+  # View current value
+  go env GOPRIVATE
+  # Clear (be aware this affects all private modules under github.com/Jeomhps/*)
+  # go env -w GOPRIVATE=
+  ```
 
 ## Build
 
@@ -95,4 +150,6 @@ Notes:
 - `--docker-host` (`DOCKER_HOST_GATEWAY_NAME`, default `host.docker.internal`)
 - `--keychain` (`KEYCHAIN`, default `auto`) — `auto|on|off` to control OS keychain use
 
-See also: docs/KEYCHAIN.md for details on secure token storage.
+## Keychain storage
+
+See [docs/KEYCHAIN.md](docs/KEYCHAIN.md) for details on secure token storage on macOS, Windows, and Linux.
