@@ -30,3 +30,9 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# projet-iac-cli
+dist/
+*.exe
+*.zip
+*.tar.gz
