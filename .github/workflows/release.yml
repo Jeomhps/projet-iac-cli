@@ -26,7 +26,8 @@ jobs:
       - name: GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
-          version: latest
+          # Pin to a specific GoReleaser version; update as needed.
+          version: v2.12.7
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

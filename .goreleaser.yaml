@@ -1,3 +1,5 @@
+version: 2
+
 project_name: projet-iac-cli
 
 before:
@@ -14,21 +16,13 @@ builds:
       - -s -w
       - -X github.com/Jeomhps/projet-iac-cli/cmd.version={{.Version}}
       - -X github.com/Jeomhps/projet-iac-cli/cmd.commit={{.ShortCommit}}
-    goos:
-      - linux
-      - darwin
-      - windows
-    goarch:
-      - amd64
-      - arm64
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
 
 archives:
+  # Rely on GoReleaser v2 defaults (tar.gz for linux/darwin, zip for windows).
+  # This avoids deprecated fields like archives.format_overrides and archives.builds.
   - id: default
-    builds:
-      - cli
-    format_overrides:
-      - goos: windows
-        format: zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - LICENSE*
