@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
 
 	"github.com/Jeomhps/projet-iac-cli/internal/client"
+	"github.com/Jeomhps/projet-iac-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -23,10 +23,7 @@ var reservationsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		var out any
-		_ = json.Unmarshal(resp.Body, &out)
-		b, _ := json.MarshalIndent(out, "", "  ")
-		fmt.Println(string(b))
+		fmt.Print(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }
@@ -61,10 +58,7 @@ var reserveCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		var out any
-		_ = json.Unmarshal(resp.Body, &out)
-		b, _ := json.MarshalIndent(out, "", "  ")
-		fmt.Println(string(b))
+		fmt.Print(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }

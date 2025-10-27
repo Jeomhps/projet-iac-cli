@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/Jeomhps/projet-iac-cli/internal/client"
+	"github.com/Jeomhps/projet-iac-cli/internal/output"
 	"github.com/Jeomhps/projet-iac-cli/internal/types"
 	"github.com/spf13/cobra"
 )
@@ -27,10 +27,7 @@ var machinesListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		var out any
-		_ = json.Unmarshal(resp.Body, &out)
-		b, _ := json.MarshalIndent(out, "", "  ")
-		fmt.Println(string(b))
+		fmt.Print(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }
@@ -69,10 +66,7 @@ var machinesAddCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		var out any
-		_ = json.Unmarshal(resp.Body, &out)
-		b, _ := json.MarshalIndent(out, "", "  ")
-		fmt.Println(string(b))
+		fmt.Print(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }

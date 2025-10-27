@@ -17,6 +17,7 @@ type FileConfig struct {
 	RewriteLocalhost      *bool   `yaml:"rewrite_localhost"`
 	DockerHostGatewayName *string `yaml:"docker_host_gateway_name"`
 	KeychainMode          *string `yaml:"keychain"` // "auto" | "on" | "off"
+	ColorMode             *string `yaml:"color"`    // "auto" | "always" | "never"
 }
 
 // DefaultPath returns ~/.projet-iac/config.yaml

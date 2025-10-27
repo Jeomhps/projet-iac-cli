@@ -13,7 +13,7 @@ import (
 
 var (
 	cfg     client.Config
-	version = "0.1.0"
+	version = "dev"
 	commit  = "dev"
 
 	// flag vars (separate from cfg so we can control precedence)
@@ -25,6 +25,10 @@ var (
 	flagRewriteLocalhost  bool
 	flagDockerHostGateway string
 	flagKeychainMode      string
+	flagColorMode         string
+
+	// final output color mode resolved from config/env/flags
+	colorMode string
 )
 
 var rootCmd = &cobra.Command{
@@ -60,6 +64,7 @@ func init() {
 		DockerHostGatewayName: "host.docker.internal",
 		KeychainMode:          "auto", // auto|on|off
 	}
+	colorMode = "auto" // auto|always|never
 
 	// Flags (bind to separate vars so we can decide precedence)
 	rootCmd.PersistentFlags().StringVar(&flagConfigPath, "config", getenv("CONFIG_FILE", configloader.DefaultPath()), "Path to config file (YAML)")
@@ -71,6 +76,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&flagRewriteLocalhost, "rewrite-localhost", cfg.RewriteLocalhost, "Rewrite localhost/127.0.0.1 to host.docker.internal")
 	rootCmd.PersistentFlags().StringVar(&flagDockerHostGateway, "docker-host", cfg.DockerHostGatewayName, "Name used when rewriting localhost")
 	rootCmd.PersistentFlags().StringVar(&flagKeychainMode, "keychain", cfg.KeychainMode, "Keychain usage: auto|on|off")
+	rootCmd.PersistentFlags().StringVar(&flagColorMode, "color", colorMode, "Colorize JSON output: auto|always|never")
 
 	rootCmd.Version = fmt.Sprintf("%s (%s)", version, commit)
 
@@ -83,8 +89,9 @@ func init() {
 	rootCmd.AddCommand(reserveCmd)
 	rootCmd.AddCommand(releaseAllCmd)
 	rootCmd.AddCommand(registerCmd)
-	rootCmd.AddCommand(usersCmd)
-	rootCmd.AddCommand(signupCmd)
+	// Optionally:
+	// rootCmd.AddCommand(usersCmd)
+	// rootCmd.AddCommand(signupCmd)
 }
 
 // Build final cfg from defaults <- config file <- env <- flags
@@ -117,6 +124,9 @@ func buildConfig(cmd *cobra.Command) error {
 		}
 		if fc.KeychainMode != nil && *fc.KeychainMode != "" {
 			cfg.KeychainMode = *fc.KeychainMode
+		}
+		if fc.ColorMode != nil && *fc.ColorMode != "" {
+			colorMode = *fc.ColorMode
 		}
 	}
 
@@ -159,6 +169,11 @@ func buildConfig(cmd *cobra.Command) error {
 			cfg.KeychainMode = v
 		}
 	}
+	if !flagChanged("color") {
+		if v, ok := getenvOpt("COLOR"); ok {
+			colorMode = strings.ToLower(strings.TrimSpace(v))
+		}
+	}
 
 	// 3) Explicit flags override everything
 	if flagChanged("api-base") {
@@ -181,6 +196,9 @@ func buildConfig(cmd *cobra.Command) error {
 	}
 	if flagChanged("keychain") {
 		cfg.KeychainMode = strings.ToLower(strings.TrimSpace(flagKeychainMode))
+	}
+	if flagChanged("color") {
+		colorMode = strings.ToLower(strings.TrimSpace(flagColorMode))
 	}
 
 	return nil
