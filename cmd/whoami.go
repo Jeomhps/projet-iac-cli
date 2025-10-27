@@ -21,7 +21,7 @@ var whoamiCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Print(output.FormatJSON(resp.Body, colorMode))
+		fmt.Println(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }

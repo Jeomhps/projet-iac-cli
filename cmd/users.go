@@ -31,7 +31,7 @@ var usersListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Print(output.FormatJSON(resp.Body, colorMode))
+		fmt.Println(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }
@@ -106,7 +106,7 @@ var usersCreateCmd = &cobra.Command{
 		if resp.StatusCode >= 300 {
 			return fmt.Errorf("create failed: %d %s", resp.StatusCode, string(resp.Body))
 		}
-		fmt.Print(output.FormatJSON(resp.Body, colorMode))
+		fmt.Println(output.FormatJSON(resp.Body, colorMode))
 		return nil
 	},
 }
