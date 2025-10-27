@@ -2,85 +2,52 @@
 
 Go CLI for the Projet IAC API at `https://localhost/api` (by default).
 
-## Install (private repo)
+## Install (private via SSH)
 
-Because this repository is private, the Go toolchain needs to fetch it directly from Git using your GitHub credentials. You have three easy options.
+Because this repository is private, the Go toolchain must fetch it via Git using your SSH key.
 
-### Option A: go install (recommended for Go users)
-
-1) Authenticate Git for GitHub access
-- Easiest: use GitHub CLI and set up Git credentials:
-  ```bash
-  gh auth login
-  gh auth setup-git
-  ```
-  Or use SSH keys (recommended) and verify:
-  ```bash
-  ssh -T git@github.com
-  # Should say: "Hi <user>! You've successfully authenticated..."
-  ```
-
-2) Tell Go that the repo is private so it skips the public proxy and checksum DB:
+1) Ensure your SSH key works with GitHub
 ```bash
-go env -w GOPRIVATE=github.com/Jeomhps
+ssh -T git@github.com
+# Expect: "Hi <you>! You've successfully authenticated..."
 ```
 
-3) Install the CLI:
-- Latest:
-  ```bash
-  go install github.com/Jeomhps/projet-iac-cli@latest
-  ```
-- Specific version tag:
-  ```bash
-  go install github.com/Jeomhps/projet-iac-cli@v0.1.0
-  ```
+2) Tell Git to use SSH for any GitHub URL
+```bash
+git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+# (Optional, narrower scope)
+# git config --global url."ssh://git@github.com/Jeomhps/".insteadOf "https://github.com/Jeomhps/"
+```
 
-4) Make sure your Go bin is on PATH, then verify:
+3) Tell Go that your repos are private (skip proxy/checksum DB)
+```bash
+go env -w GOPRIVATE=github.com/Jeomhps/*
+```
+
+4) Install with go
+```bash
+# Latest
+go install github.com/Jeomhps/projet-iac-cli@latest
+
+# Or a specific version tag
+# go install github.com/Jeomhps/projet-iac-cli@v0.1.0
+```
+
+5) Ensure your Go bin is on PATH, then verify
 ```bash
 # macOS/Linux:
 echo "$(go env GOPATH)/bin" | grep -q "$PATH" || echo "Add $(go env GOPATH)/bin to PATH"
 projet-iac-cli --version
 ```
 
-Notes
-- If you prefer HTTPS with a Personal Access Token (PAT), run:
+Troubleshooting
+- Remove/inspect the SSH mapping
   ```bash
-  gh auth login
-  gh auth setup-git
+  git config --global --get-all url."ssh://git@github.com/".insteadOf
+  # To remove:
+  # git config --global --unset-all url."ssh://git@github.com/".insteadOf
   ```
-  This configures Git to use your token automatically for github.com.
-- The GOPRIVATE pattern can be scoped broadly (owner-wide) or to a single repo. Owner-wide is convenient:
-  - `go env -w GOPRIVATE=github.com/Jeomhps`
-
-### Option B: Download a release (no Go toolchain required)
-
-1) Go to the project’s Releases page (you must be logged into GitHub):
-- https://github.com/Jeomhps/projet-iac-cli/releases
-
-2) Download the archive for your OS/CPU, then extract and place the binary on your PATH:
-- macOS/Linux:
-  ```bash
-  tar -xzf projet-iac-cli_<version>_<os>_<arch>.tar.gz
-  sudo mv projet-iac-cli /usr/local/bin/
-  projet-iac-cli --version
-  ```
-- Windows:
-  - Download the `.zip`, extract `projet-iac-cli.exe`, put it somewhere on your PATH.
-
-### Option C: Build from source
-
-- Using SSH (recommended):
-  ```bash
-  git clone git@github.com:Jeomhps/projet-iac-cli.git
-  cd projet-iac-cli
-  go build -o projet-iac-cli
-  ```
-- Using GitHub CLI:
-  ```bash
-  gh repo clone Jeomhps/projet-iac-cli
-  cd projet-iac-cli
-  go build -o projet-iac-cli
-  ```
+- If go install still prompts for HTTPS credentials, the mapping isn’t being applied; re-check step 2.
 
 ## Build
 
