@@ -139,81 +139,13 @@ var usersDeleteCmd = &cobra.Command{
 	},
 }
 
-// Self-service signup (no token required)
-var (
-	signupUsername  string
-	signupPassword  string
-	signupAutoLogin bool
-)
-
-var signupCmd = &cobra.Command{
-	Use:   "signup",
-	Short: "Self-register a new user (POST /register)",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if strings.TrimSpace(signupUsername) == "" {
-			return fmt.Errorf("--username is required")
-		}
-		pass := strings.TrimSpace(signupPassword)
-		if pass == "" {
-			if !term.IsTerminal(int(os.Stdin.Fd())) {
-				return fmt.Errorf("stdin is not a TTY. Provide --password or add a --password-stdin flow if needed")
-			}
-			fmt.Print("Password: ")
-			p1, err := term.ReadPassword(int(os.Stdin.Fd()))
-			fmt.Println()
-			if err != nil {
-				return fmt.Errorf("reading password: %w", err)
-			}
-			if len(p1) == 0 {
-				return fmt.Errorf("password cannot be empty")
-			}
-			fmt.Print("Confirm password: ")
-			p2, err := term.ReadPassword(int(os.Stdin.Fd()))
-			fmt.Println()
-			if err != nil {
-				return fmt.Errorf("reading confirmation: %w", err)
-			}
-			if string(p1) != string(p2) {
-				return fmt.Errorf("passwords do not match")
-			}
-			pass = string(p1)
-		}
-
-		cl := client.New(cfg)
-		payload := types.UserSignup{
-			Username: signupUsername,
-			Password: pass,
-		}
-		resp, err := cl.PostJSON("/register", "", payload)
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode >= 300 {
-			return fmt.Errorf("signup failed: %d %s", resp.StatusCode, string(resp.Body))
-		}
-		fmt.Println("Signup successful.")
-		if signupAutoLogin {
-			token, exp, err := cl.Login(signupUsername, pass)
-			if err != nil {
-				return fmt.Errorf("auto-login failed: %w", err)
-			}
-			if err := cl.SaveToken(token, exp); err != nil {
-				return fmt.Errorf("saving token failed: %w", err)
-			}
-			fmt.Println("Logged in and token cached.")
-		}
-		return nil
-	},
-}
-
 func init() {
 	// Wire commands into root
 	rootCmd.AddCommand(usersCmd)
-	rootCmd.AddCommand(signupCmd)
 
 	// users subcommands
 	usersCmd.AddCommand(usersListCmd)
-	usersCmd.AddCommand(usersCreateCmd)
+usersCmd.AddCommand(usersCreateCmd)
 	usersCmd.AddCommand(usersDeleteCmd)
 
 	// Flags
@@ -223,8 +155,4 @@ func init() {
 	usersCreateCmd.Flags().BoolVar(&uNoConfirm, "no-confirm", false, "Skip password confirmation (useful with --password-stdin)")
 
 	usersDeleteCmd.Flags().StringVar(&uDeleteUsername, "username", "", "Username to delete")
-
-	signupCmd.Flags().StringVar(&signupUsername, "username", "", "Username")
-	signupCmd.Flags().StringVar(&signupPassword, "password", "", "Password (omit to be securely prompted)")
-	signupCmd.Flags().BoolVar(&signupAutoLogin, "login", false, "Automatically log in and cache token after signup")
 }

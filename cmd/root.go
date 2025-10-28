@@ -54,10 +54,10 @@ func init() {
 	home, _ := os.UserHomeDir()
 	defaultToken := filepath.Join(home, ".projet-iac", "token.json")
 
-	// Built-in defaults
+	// Built-in defaults for the NEW API (no prefix)
 	cfg = client.Config{
-		APIBase:               "https://localhost",
-		APIPrefix:             "/api",
+		APIBase:               "https://localhost/api",
+		APIPrefix:             "", // no /api prefix in the new API
 		VerifyTLS:             false,
 		TokenFile:             defaultToken,
 		RewriteLocalhost:      true,
@@ -70,7 +70,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&flagConfigPath, "config", getenv("CONFIG_FILE", configloader.DefaultPath()), "Path to config file (YAML)")
 
 	rootCmd.PersistentFlags().StringVar(&flagAPIBase, "api-base", cfg.APIBase, "Base URL (e.g., https://localhost)")
-	rootCmd.PersistentFlags().StringVar(&flagAPIPrefix, "api-prefix", cfg.APIPrefix, "API prefix path (e.g., /api)")
+	rootCmd.PersistentFlags().StringVar(&flagAPIPrefix, "api-prefix", cfg.APIPrefix, "API prefix path (leave empty for new API)")
 	rootCmd.PersistentFlags().BoolVar(&flagVerifyTLS, "verify-tls", cfg.VerifyTLS, "Verify TLS certificates")
 	rootCmd.PersistentFlags().StringVar(&flagTokenFile, "token-file", cfg.TokenFile, "Token cache file (~/.projet-iac/token.json) (used if keychain unavailable/disabled)")
 	rootCmd.PersistentFlags().BoolVar(&flagRewriteLocalhost, "rewrite-localhost", cfg.RewriteLocalhost, "Rewrite localhost/127.0.0.1 to host.docker.internal")
@@ -87,11 +87,8 @@ func init() {
 	rootCmd.AddCommand(machinesCmd)
 	rootCmd.AddCommand(reservationsCmd)
 	rootCmd.AddCommand(reserveCmd)
-	rootCmd.AddCommand(releaseAllCmd)
 	rootCmd.AddCommand(registerCmd)
-	// Optionally:
-	// rootCmd.AddCommand(usersCmd)
-	// rootCmd.AddCommand(signupCmd)
+	// Removed: release-all (legacy) and signup (no endpoint in new API)
 }
 
 // Build final cfg from defaults <- config file <- env <- flags
@@ -126,7 +123,7 @@ func buildConfig(cmd *cobra.Command) error {
 			cfg.KeychainMode = *fc.KeychainMode
 		}
 		if fc.ColorMode != nil && *fc.ColorMode != "" {
-			colorMode = *fc.ColorMode
+ 			colorMode = *fc.ColorMode
 		}
 	}
 

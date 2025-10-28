@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"net/url"
-	"strconv"
 
 	"github.com/Jeomhps/projet-iac-cli/internal/client"
 	"github.com/Jeomhps/projet-iac-cli/internal/output"
@@ -47,36 +45,19 @@ var reserveCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		q := url.Values{}
-		q.Set("count", strconv.Itoa(reserveCount))
-		q.Set("duration", strconv.Itoa(reserveDuration))
-		q.Set("reservation_password", reservePassword)
-		if reserveAsUser != "" {
-			q.Set("username", reserveAsUser)
+		payload := map[string]any{
+			"count":                reserveCount,
+			"duration_minutes":     reserveDuration,
+			"reservation_password": reservePassword,
 		}
-		resp, err := cl.Get("/reserve?"+q.Encode(), token)
+		if reserveAsUser != "" {
+			payload["username"] = reserveAsUser
+		}
+		resp, err := cl.PostJSON("/reservations", token, payload)
 		if err != nil {
 			return err
 		}
 		fmt.Println(output.FormatJSON(resp.Body, colorMode))
-		return nil
-	},
-}
-
-var releaseAllCmd = &cobra.Command{
-	Use:   "release-all",
-	Short: "Release all reservations (admin)",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		cl := client.New(cfg)
-		token, err := cl.GetToken()
-		if err != nil {
-			return err
-		}
-		_, err = cl.Get("/release_all", token)
-		if err != nil {
-			return err
-		}
-		fmt.Println("All reservations released.")
 		return nil
 	},
 }

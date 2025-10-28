@@ -10,14 +10,14 @@ import (
 
 var whoamiCmd = &cobra.Command{
 	Use:   "whoami",
-	Short: "Show current user info (/whoami)",
+	Short: "Show current user info (/auth/me)",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cl := client.New(cfg)
 		token, err := cl.GetToken()
 		if err != nil {
 			return err
 		}
-		resp, err := cl.Get("/whoami", token)
+		resp, err := cl.Get("/auth/me", token)
 		if err != nil {
 			return err
 		}

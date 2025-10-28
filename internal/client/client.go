@@ -118,11 +118,11 @@ func (c *Client) Delete(path string, token string) (*HTTPResponse, error) {
 	return c.do(req)
 }
 
-// Login posts username/password to /login and returns access token and expiry.
+// Login posts username/password to /auth/login and returns access token and expiry.
 // If API doesn't return expires_in, we try to read exp from the JWT; fallback to 60m.
 func (c *Client) Login(username, password string) (token string, expiresAt *time.Time, err error) {
 	payload := map[string]string{"username": username, "password": password}
-	res, err := c.PostJSON("/login", "", payload)
+	res, err := c.PostJSON("/auth/login", "", payload)
 	if err != nil {
 		return "", nil, err
 	}
