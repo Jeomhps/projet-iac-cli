@@ -56,7 +56,7 @@ func init() {
 
 	// Built-in defaults for the NEW API (no prefix)
 	cfg = client.Config{
-		APIBase:               "https://localhost/api",
+		APIBase:               "https://localhost",
 		APIPrefix:             "", // no /api prefix in the new API
 		VerifyTLS:             false,
 		TokenFile:             defaultToken,
