@@ -1,6 +1,6 @@
 # projet-iac-cli
 
-Go CLI for the Projet IAC API at `https://localhost/api` (by default).
+Go CLI for the Projet IAC API at `https://localhost` (by default).
 
 ## Table of contents
 - [Install (private via SSH)](#install-private-via-ssh)
@@ -77,15 +77,15 @@ Troubleshooting
   ```
 - If the CLI is already removed:
   - macOS (Keychain Access):
-    - Open Keychain Access → search for “projet-iac-cli” → delete the entry with account `api:https://localhost/api`.
+    - Open Keychain Access → search for “projet-iac-cli” → delete the entry with account `api:https://localhost`.
     - Or via terminal:
       ```bash
-      security delete-generic-password -s projet-iac-cli -a 'api:https://localhost/api' || true
+      security delete-generic-password -s projet-iac-cli -a 'api:https://localhost' || true
       ```
   - Windows (Credential Manager):
-    - Open “Credential Manager” → “Windows Credentials” → remove the entry named “projet-iac-cli” (account `api:https://localhost/api`).
+    - Open “Credential Manager” → “Windows Credentials” → remove the entry named “projet-iac-cli” (account `api:https://localhost`).
   - Linux (Secret Service, if used):
-    - Use your keyring UI (GNOME Keyring/KWallet) to remove the “projet-iac-cli” secret with account `api:https://localhost/api`.
+    - Use your keyring UI (GNOME Keyring/KWallet) to remove the “projet-iac-cli” secret with account `api:https://localhost`.
     - If no keyring was available, the token file is at:
       ```bash
       rm -f ~/.projet-iac/token.json
@@ -117,7 +117,7 @@ go build -o projet-iac-cli
 
 ```bash
 export API_BASE=https://localhost
-export API_PREFIX=/api
+
 export VERIFY_TLS=false
 
 ./projet-iac-cli login          # prompts for username/password
@@ -143,7 +143,7 @@ Notes:
 ## Config (flags or env)
 
 - `--api-base` (`API_BASE`, default `https://localhost`)
-- `--api-prefix` (`API_PREFIX`, default `/api`)
+
 - `--verify-tls` (`VERIFY_TLS`, default `false`)
 - `--token-file` (`TOKEN_FILE`, default `~/.projet-iac/token.json`) — used if OS keychain is unavailable/disabled
 - `--rewrite-localhost` (`REWRITE_LOCALHOST`, default `true`)

@@ -19,7 +19,6 @@ import (
 
 type Config struct {
 	APIBase               string
-	APIPrefix             string
 	VerifyTLS             bool
 	TokenFile             string
 	RewriteLocalhost      bool
@@ -51,7 +50,7 @@ func New(cfg Config) *Client {
 	if mode == "" {
 		mode = securestore.ModeAuto
 	}
-	key := securestore.KeyNameFor(cfg.APIBase, cfg.APIPrefix)
+	key := securestore.KeyNameFor(cfg.APIBase, "")
 	file := cfg.TokenFile
 	if file == "" {
 		home, _ := os.UserHomeDir()
@@ -71,7 +70,7 @@ func (c *Client) url(path string) string {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
-	return c.cfg.APIBase + c.cfg.APIPrefix + path
+	return c.cfg.APIBase + path
 }
 
 func (c *Client) ShouldRewrite(host string) bool {

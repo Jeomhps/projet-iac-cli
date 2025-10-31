@@ -11,7 +11,6 @@ import (
 // FileConfig uses pointer fields to detect presence in YAML.
 type FileConfig struct {
 	APIBase               *string `yaml:"api_base"`
-	APIPrefix             *string `yaml:"api_prefix"`
 	VerifyTLS             *bool   `yaml:"verify_tls"`
 	TokenFile             *string `yaml:"token_file"`
 	RewriteLocalhost      *bool   `yaml:"rewrite_localhost"`

@@ -17,9 +17,9 @@ var (
 	commit  = "dev"
 
 	// flag vars (separate from cfg so we can control precedence)
-	flagConfigPath        string
-	flagAPIBase           string
-	flagAPIPrefix         string
+	flagConfigPath string
+	flagAPIBase    string
+
 	flagVerifyTLS         bool
 	flagTokenFile         string
 	flagRewriteLocalhost  bool
@@ -43,9 +43,7 @@ var rootCmd = &cobra.Command{
 
 		// Normalize a couple of fields
 		cfg.APIBase = strings.TrimRight(cfg.APIBase, "/")
-		if cfg.APIPrefix != "" && !strings.HasPrefix(cfg.APIPrefix, "/") {
-			cfg.APIPrefix = "/" + cfg.APIPrefix
-		}
+
 		return nil
 	},
 }
@@ -56,8 +54,8 @@ func init() {
 
 	// Built-in defaults for the NEW API (no prefix)
 	cfg = client.Config{
-		APIBase:               "https://localhost",
-		APIPrefix:             "", // no /api prefix in the new API
+		APIBase: "https://localhost",
+
 		VerifyTLS:             false,
 		TokenFile:             defaultToken,
 		RewriteLocalhost:      true,
@@ -70,7 +68,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&flagConfigPath, "config", getenv("CONFIG_FILE", configloader.DefaultPath()), "Path to config file (YAML)")
 
 	rootCmd.PersistentFlags().StringVar(&flagAPIBase, "api-base", cfg.APIBase, "Base URL (e.g., https://localhost)")
-	rootCmd.PersistentFlags().StringVar(&flagAPIPrefix, "api-prefix", cfg.APIPrefix, "API prefix path (leave empty for new API)")
+
 	rootCmd.PersistentFlags().BoolVar(&flagVerifyTLS, "verify-tls", cfg.VerifyTLS, "Verify TLS certificates")
 	rootCmd.PersistentFlags().StringVar(&flagTokenFile, "token-file", cfg.TokenFile, "Token cache file (~/.projet-iac/token.json) (used if keychain unavailable/disabled)")
 	rootCmd.PersistentFlags().BoolVar(&flagRewriteLocalhost, "rewrite-localhost", cfg.RewriteLocalhost, "Rewrite localhost/127.0.0.1 to host.docker.internal")
@@ -104,9 +102,7 @@ func buildConfig(cmd *cobra.Command) error {
 		if fc.APIBase != nil {
 			cfg.APIBase = *fc.APIBase
 		}
-		if fc.APIPrefix != nil {
-			cfg.APIPrefix = *fc.APIPrefix
-		}
+
 		if fc.VerifyTLS != nil {
 			cfg.VerifyTLS = *fc.VerifyTLS
 		}
@@ -123,7 +119,7 @@ func buildConfig(cmd *cobra.Command) error {
 			cfg.KeychainMode = *fc.KeychainMode
 		}
 		if fc.ColorMode != nil && *fc.ColorMode != "" {
- 			colorMode = *fc.ColorMode
+			colorMode = *fc.ColorMode
 		}
 	}
 
@@ -136,11 +132,7 @@ func buildConfig(cmd *cobra.Command) error {
 			cfg.APIBase = v
 		}
 	}
-	if !flagChanged("api-prefix") {
-		if v, ok := getenvOpt("API_PREFIX"); ok {
-			cfg.APIPrefix = v
-		}
-	}
+
 	if !flagChanged("verify-tls") {
 		if v, ok := envBoolOpt("VERIFY_TLS"); ok {
 			cfg.VerifyTLS = v
@@ -176,9 +168,7 @@ func buildConfig(cmd *cobra.Command) error {
 	if flagChanged("api-base") {
 		cfg.APIBase = flagAPIBase
 	}
-	if flagChanged("api-prefix") {
-		cfg.APIPrefix = flagAPIPrefix
-	}
+
 	if flagChanged("verify-tls") {
 		cfg.VerifyTLS = flagVerifyTLS
 	}

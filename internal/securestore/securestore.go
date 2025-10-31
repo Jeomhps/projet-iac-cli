@@ -124,5 +124,5 @@ func keyringAvailable() bool {
 
 // KeyNameFor builds a stable key name per API base+prefix.
 func KeyNameFor(base, prefix string) string {
-	return fmt.Sprintf("api:%s%s", base, prefix)
+	return fmt.Sprintf("api:%s", base)
 }
