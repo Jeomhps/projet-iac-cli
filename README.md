@@ -18,7 +18,7 @@ Go CLI for the Projet IAC API at `https://localhost` (by default).
 go install github.com/Jeomhps/projet-iac-cli@latest
 
 # Or a specific version tag
-# go install github.com/Jeomhps/projet-iac-cli@v0.1.0
+# go install github.com/Jeomhps/projet-iac-cli@v0.1.4
 ```
 
 2) Ensure your Go bin is on PATH, then verify
